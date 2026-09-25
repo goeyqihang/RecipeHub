@@ -1,0 +1,275 @@
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <h1 class="mb-0"><i class="bi bi-box-seam"></i> Inventory Dashboard</h1>
+        <div>
+            <a routerLink="/inventory/add" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Add New Item
+            </a>
+        </div>
+    </div>
+
+    @if (isLoading && !inventoryListData$) { <div class="text-center my-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Loading inventory data...</p>
+    </div>
+    } @else if (error) {
+    <div class="alert alert-danger" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
+    </div>
+    }
+
+    <form #filterForm="ngForm" (ngSubmit)="applyFilters()">
+        <div class="row g-3 align-items-center mb-4 p-3 bg-light border rounded">
+            <div class="col-md-3">
+                <label for="filterCategory" class="form-label">Category</label>
+                <select class="form-select" id="filterCategory" name="filterCategory"
+                    [(ngModel)]="currentFilters.category">
+                    @for (cat of categories; track cat) {
+                    <option [value]="cat">{{ cat === 'all' ? 'All Categories' : cat }}</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="filterLocation" class="form-label">Location</label>
+                <select class="form-select" id="filterLocation" name="filterLocation"
+                    [(ngModel)]="currentFilters.location">
+                    @for (loc of locations; track loc) {
+                    <option [value]="loc">{{ loc === 'all' ? 'All Locations' : loc }}</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="filterStatus" class="form-label">Status</label>
+                <select class="form-select" id="filterStatus" name="filterStatus" [(ngModel)]="currentFilters.status">
+                    @for (st of statuses; track st) {
+                    <option [value]="st">{{ st }}</option>
+                    }
+                    <option value="all">All Statuses</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="filterExpiring" class="form-label">Expiring Within (Days)</label>
+                <input type="number" class="form-control" id="filterExpiring" name="filterExpiring"
+                    [(ngModel)]="currentFilters.expiringWithinDays" min="0" placeholder="e.g., 7">
+            </div>
+
+            <div class="col-md-3">
+                <label for="sortBy" class="form-label">Sort By</label>
+                <select class="form-select" id="sortBy" name="sortBy" [(ngModel)]="currentFilters.sortBy">
+                    <option value="">Default (Name)</option>
+                    <option value="ingredientName">Name</option>
+                    <option value="expirationDate">Expiration Date</option>
+                    <option value="quantity">Quantity</option>
+                    <option value="purchaseDate">Purchase Date</option>
+                    <option value="cost">Cost</option>
+                    <option value="category">Category</option>
+                    <option value="location">Location</option>
+                    <option value="createdDate">Date Added</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="sortDir" class="form-label">Sort Direction</label>
+                <select class="form-select" id="sortDir" name="sortDir" [(ngModel)]="currentFilters.sortDir">
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                </select>
+            </div>
+
+            <div class="col-md-6 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-info">
+                    <i class="bi bi-funnel-fill"></i> Apply Filters
+                </button>
+                <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">
+                    <i class="bi bi-x-circle"></i> Clear Filters
+                </button>
+            </div>
+        </div>
+    </form>
+    @if (inventoryListData$ | async; as data) {
+    <div class="row g-4 mb-5 text-center">
+        <div class="col-md-6 col-lg-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="display-5 fw-bold text-success">{{ data.stats.totalValue | currency:'$' }}</h1>
+                    <p class="text-muted mb-0">Total Value (In Stock)</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="display-5 fw-bold">{{ data.stats.totalItems }}</h1>
+                    <p class="text-muted mb-0">Total Items (In Stock)</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card text-dark bg-warning shadow-sm">
+                <div class="card-body">
+                    <h1 class="display-5 fw-bold">{{ data.stats.lowStockCount }}</h1>
+                    <p class="mb-0">Low Stock (In Stock)</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card text-white bg-danger shadow-sm">
+                <div class="card-body">
+                    <h1 class="display-5 fw-bold">{{ data.stats.expiringSoonCount }}</h1>
+                    <p class="mb-0">Expiring Soon (In Stock)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Inventory Items {{ currentFilters.status && currentFilters.status !== 'all' ? '(' +
+            currentFilters.status + ')' : '(Filtered)' }}</h4> <span class="badge bg-light text-dark fs-6 rounded-pill">
+            {{ data.inventoryItems.length }} {{ data.inventoryItems.length === 1 ? 'item' : 'items' }} found
+        </span>
+    </div>
+
+    @if (isLoading) { <div class="text-center my-5">
+        <div class="spinner-border text-secondary" role="status">
+            <span class="visually-hidden">Applying filters...</span>
+        </div>
+        <p class="mt-2 text-muted">Applying filters...</p>
+    </div>
+    } @else if (data.inventoryItems && data.inventoryItems.length > 0) {
+    @for (item of data.inventoryItems; track item.inventoryId) {
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <h3 class="card-title mb-1">{{ item.ingredientName }}</h3>
+                    @if (item.status !== 'In Stock') {
+                    <span class="badge rounded-pill me-1" [ngClass]="{
+                                    'bg-secondary': item.status === 'Consumed',
+                                    'bg-warning text-dark': item.status === 'Wasted'
+                                }">{{ item.status }}</span>
+                    }
+                    <span
+                        class="badge bg-secondary-subtle border border-secondary-subtle text-secondary-emphasis rounded-pill">
+                        {{ item.category }}
+                    </span>
+                </div>
+                <span class="badge bg-light text-dark rounded-pill fs-6">
+                    {{ item.inventoryId }}
+                </span>
+            </div>
+            <hr>
+            <div class="row gy-4">
+                <div class="col-lg-6 border-end pe-lg-4">
+                    <h5 class="mb-3 text-muted">Item Details</h5>
+                    <div class="d-flex justify-content-between mb-2"><strong>Quantity:</strong>
+                        <span>{{ item.quantity }} {{ item.unit }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2"><strong>Location:</strong>
+                        <span>{{ item.location }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2"><strong>Added By (User ID):</strong>
+                        <span>{{ item.userId }}</span>
+                    </div>
+                    <hr class="my-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Purchase Cost:</h6>
+                        <span class="badge bg-success-subtle text-success-emphasis rounded-pill fs-6">
+                            {{ item.cost | currency:'$' }}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-6 ps-lg-4">
+                    <h5 class="mb-3 text-muted">Important Dates</h5>
+                    <div class="d-flex justify-content-between mb-2"><strong>Purchase Date:</strong>
+                        <span>{{ item.purchaseDate | date:'shortDate' }}</span>
+                    </div>
+                    @if (item.status !== 'Consumed' && item.status !== 'Wasted') { <div
+                        class="d-flex justify-content-between mb-2">
+                        <strong>Expiration Date:</strong>
+                        <span [ngClass]="{'text-danger fw-bold': isExpired(item.expirationDate)}">
+                            {{ item.expirationDate | date:'shortDate' }}
+                            @if (daysUntilExpiration(item.expirationDate) !== null) {
+                            <span class="badge ms-2 {{ getExpirationBadgeClass(item.expirationDate) }} rounded-pill">
+                                @if (isExpired(item.expirationDate)) {
+                                Expired
+                                } @else if (daysUntilExpiration(item.expirationDate)! <= 0) { Expiring Today } @else {
+                                    {{ daysUntilExpiration(item.expirationDate) }}d left } </span>
+                                    }
+                            </span>
+                    </div>
+                    } @else if (item.consumedDate) {
+                    <div class="d-flex justify-content-between mb-2">
+                        <strong>{{ item.status }} Date:</strong> <span>{{ item.consumedDate | date:'shortDate' }}</span>
+                    </div>
+                    }
+                    <div class="d-flex justify-content-between mb-2"><strong>Date Added:</strong>
+                        <span>{{ item.createdDate | date:'shortDate' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-light d-flex justify-content-end align-items-center gap-2">
+            <a [routerLink]="['/inventory/view', item.inventoryId]" class="btn btn-sm btn-outline-secondary"
+                title="View Details">
+                <i class="bi bi-eye"></i> View
+            </a>
+            @if (item.status === 'In Stock') {
+            <a [routerLink]="['/inventory/edit', item.inventoryId]" class="btn btn-sm btn-primary" title="Update">
+                <i class="bi bi-pencil-square"></i> Update
+            </a>
+            <button (click)="openDeleteConfirmation(deleteConfirmModal, item)" class="btn btn-sm btn-danger"
+                title="Remove Item">
+                <i class="bi bi-trash"></i> Remove
+            </button>
+            }
+        </div>
+    </div>
+    }
+    } @else if (!isLoading) { <div class="card text-center py-5">
+        <div class="card-body">
+            <p class="text-muted fs-5">No inventory items found matching your filters.</p>
+            @if (currentFilters.category === 'all' && currentFilters.location === 'all' && currentFilters.status === 'In Stock' &&
+            !currentFilters.expiringWithinDays) {
+            <p> <a routerLink="/inventory/add" class="btn btn-primary">
+                    <i class="bi bi-plus-lg"></i> Add New Item
+                </a>
+            </p>
+            } @else {
+            <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">
+                <i class="bi bi-x-circle"></i> Clear Filters and Show All 'In Stock'
+            </button>
+            }
+        </div>
+    </div>
+    }
+    }
+</div>
+
+<ng-template #deleteConfirmModal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-confirm-delete-inventory">Confirm Removal</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        @if (itemToDelete) {
+        <p>Are you sure you want to remove the item "<strong>{{ itemToDelete.ingredientName }}</strong>"?</p>
+        <div class="mb-3">
+            <label for="deletionReason" class="form-label">Reason for removal:</label>
+            <select class="form-select" id="deletionReason" name="deletionReason" [(ngModel)]="deletionReason">
+                <option value="Consumed">Consumed</option>
+                <option value="Wasted">Wasted / Expired</option>
+                <option value="PermanentDelete">Data Entry Error (Delete Permanently)</option>
+            </select>
+        </div>
+        <p><small class="text-muted">Choose 'Consumed' or 'Wasted' to mark it as used/discarded (soft delete). Choose
+                'Data Entry Error' to permanently remove the record.</small></p>
+        } @else {
+        <p>Loading item details...</p>
+        }
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.dismiss('cancel click')">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="modal.close('delete')" [disabled]="!itemToDelete">Confirm
+            Removal</button>
+    </div>
+</ng-template>

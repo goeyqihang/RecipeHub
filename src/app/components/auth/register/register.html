@@ -1,0 +1,142 @@
+<div class="register-container">
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-md-8 col-lg-6 col-xl-5">
+
+                <div class="card shadow-lg border-0">
+                    <div class="card-body p-4 p-md-5">
+
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bolder">Register</h2>
+                            <p class="text-muted">Create your Recipe & Inventory Management account</p>
+                        </div>
+
+                        <form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm)" novalidate>
+
+                            <!-- Email Input -->
+                            <div class="mb-3">
+                                <label for="email" class="form-label fw-bold">Email Address:</label>
+                                <input type="email" id="email" name="email" class="form-control form-control-lg"
+                                    [(ngModel)]="registerUser.email" #email="ngModel" required email
+                                    [ngClass]="{ 'is-invalid': email.invalid && (email.touched || submitted) }">
+
+                                @if (email.invalid && (email.touched || submitted)) {
+                                <div class="invalid-feedback">
+                                    @if (email.errors?.['required']) {
+                                    <div>Email is required.</div>
+                                    }
+                                    @if (email.errors?.['email']) {
+                                    <div>Please enter a valid email address.</div>
+                                    }
+                                </div>
+                                }
+                            </div>
+
+                            <!-- Password Input -->
+                            <div class="mb-3">
+                                <label for="password" class="form-label fw-bold">Password:</label>
+                                <input type="password" id="password" name="password"
+                                    class="form-control form-control-lg" [(ngModel)]="registerUser.password"
+                                    #password="ngModel" required minlength="8"
+                                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$"
+                                    [ngClass]="{ 'is-invalid': password.invalid && (password.touched || submitted) }">
+                                <div class="form-text">
+                                    Must be at least 8 characters with uppercase, lowercase, number, and special
+                                    character.
+                                </div>
+
+                                @if (password.invalid && (password.touched || submitted)) {
+                                <div class="invalid-feedback">
+                                    @if (password.errors?.['required']) {
+                                    <div>Password is required.</div>
+                                    }
+                                    @if (password.errors?.['pattern']) {
+                                    <div>Password does not meet the complexity requirements.</div>
+                                    }
+                                </div>
+                                }
+                            </div>
+
+                            <!-- Full Name Input -->
+                            <div class="mb-3">
+                                <label for="fullname" class="form-label fw-bold">Full Name:</label>
+                                <input type="text" id="fullname" name="fullname" class="form-control form-control-lg"
+                                    [(ngModel)]="registerUser.fullname" #fullname="ngModel" required minlength="2"
+                                    [ngClass]="{ 'is-invalid': fullname.invalid && (fullname.touched || submitted) }">
+
+                                @if (fullname.invalid && (fullname.touched || submitted)) {
+                                <div class="invalid-feedback">
+                                    @if (fullname.errors?.['required']) {
+                                    <div>Full name is required.</div>
+                                    }
+                                    @if (fullname.errors?.['minlength']) {
+                                    <div>Full name must be at least 2 characters long.</div>
+                                    }
+                                </div>
+                                }
+                            </div>
+
+                            <!-- Role Selection -->
+                            <div class="mb-3">
+                                <label for="role" class="form-label fw-bold">Role:</label>
+                                <select id="role" name="role" [(ngModel)]="registerUser.role" #role="ngModel"
+                                    required class="form-select form-select-lg"
+                                    [ngClass]="{ 'is-invalid': role.invalid && (role.touched || submitted) }">
+                                    <option value="" disabled>Choose a role...</option>
+                                    <option value="chef">Chef</option>
+                                    <option value="manager">Manager</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+
+                                @if (role.invalid && (role.touched || submitted)) {
+                                <div class="invalid-feedback">
+                                    <div>Please choose a role.</div>
+                                </div>
+                                }
+                            </div>
+
+                            <!-- Phone Input -->
+                            <div class="mb-3">
+                                <label for="phone" class="form-label fw-bold">Phone Number:</label>
+                                <input type="tel" id="phone" name="phone" class="form-control form-control-lg"
+                                    [(ngModel)]="registerUser.phone" #phone="ngModel" required
+                                    pattern="^(\+61|0)[\s-]?\d{3}[\s-]?\d{3}[\s-]?\d{3}$" placeholder="+61 412 345 678"
+                                    [ngClass]="{ 'is-invalid': phone.invalid && (phone.touched || submitted) }">
+
+                                @if (phone.invalid && (phone.touched || submitted)) {
+                                <div class="invalid-feedback">
+                                    @if (phone.errors?.['required']) {
+                                    <div>Phone number is required.</div>
+                                    }
+                                    @if (phone.errors?.['pattern']) {
+                                    <div>Please enter a valid Australian phone number.</div>
+                                    }
+                                </div>
+                                }
+                            </div>
+
+                            <!-- API Error Message Display -->
+                            @if (errorMessage) {
+                            <div class="alert alert-danger mt-3">
+                                {{ errorMessage }}
+                            </div>
+                            }
+
+                            <!-- Submit Button -->
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg"
+                                    [disabled]="!registerForm.valid">Register</button>
+                            </div>
+                        </form>
+
+                        <!-- Link to Login Page -->
+                        <div class="text-center mt-4">
+                            <p class="text-muted">Already have an account? <a routerLink="/login">Login here</a></p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

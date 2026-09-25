@@ -1,0 +1,95 @@
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+
+            @if (isLoading) {
+            <div class="text-center my-5">
+                <div class="spinner-border text-info" role="status">
+                    <span class="visually-hidden">Loading Analysis...</span>
+                </div>
+                <p class="mt-2 text-info">Loading recipe details and analyzing healthiness...</p>
+            </div>
+            } @else {
+            @if (currentRecipe) {
+            <div class="text-center mb-4">
+                <h1 class="display-5"><i class="bi bi-heart-pulse text-info"></i> Health Analysis</h1>
+                <p class="lead text-muted">Analysis for: <strong>{{ currentRecipe.title }}</strong></p>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    Recipe Details (ID: {{currentRecipe.recipeId}})
+                </div>
+                <div class="card-body">
+
+                    @if (errorMessage) {
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i> {{ errorMessage }}
+                        @if (errorMessage === 'Failed to parse health analysis from AI response.') {
+                        <p><small>The AI response might not be in the expected format. Please try again later or contact
+                                support.</small></p>
+                        }
+                    </div>
+                    }
+
+                    @if (analysisResult) {
+                    <div class="card border-info mb-3">
+                        <div class="card-header bg-info-subtle text-info-emphasis">
+                            <h5 class="mb-0"><i class="bi bi-clipboard2-pulse"></i> AI Analysis Summary</h5>
+                        </div>
+                        <div class="card-body small">
+                            <p><strong>Summary:</strong> {{ analysisResult.summary }}</p>
+
+                            @if (analysisResult.concerns && analysisResult.concerns.length > 0) {
+                            <h6><i class="bi bi-exclamation-circle text-danger"></i> Concerns:</h6>
+                            <ul class="list-unstyled ps-3">
+                                @for (concern of analysisResult.concerns; track $index) {
+                                <li><i class="bi bi-dot"></i> {{ concern }}</li>
+                                }
+                            </ul>
+                            } @else {
+                            <p class="text-success"><i class="bi bi-check-circle"></i> No major health concerns
+                                identified based on ingredients.</p>
+                            }
+
+                            @if (analysisResult.suggestions && analysisResult.suggestions.length > 0) {
+                            <h6><i class="bi bi-lightbulb text-success"></i> Suggestions for Improvement:</h6>
+                            <ul class="list-group list-group-flush">
+                                @for (suggestion of analysisResult.suggestions; track $index) {
+                                <li class="list-group-item bg-light ps-0">
+                                    <strong>{{ suggestion.suggestion }}:</strong>
+                                    <p class="mb-0 text-muted">{{ suggestion.explanation }}</p>
+                                </li>
+                                }
+                            </ul>
+                            } @else if (!errorMessage) { <p class="text-muted"><i class="bi bi-info-circle"></i> No
+                                specific improvement suggestions provided.</p>
+                            }
+                        </div>
+                    </div>
+                    } @else if (!errorMessage) {
+                    <p class="text-muted text-center">Could not retrieve analysis result.</p>
+                    }
+
+                    <div class="text-center mt-4">
+                        <a [routerLink]="['/recipes/view', currentRecipe.recipeId]"
+                            class="btn btn-outline-secondary me-2">
+                            <i class="bi bi-arrow-left"></i> Back to Recipe Details
+                        </a>
+                        <a routerLink="/recipes" class="btn btn-outline-secondary">
+                            <i class="bi bi-list-ul"></i> Back to Recipe List
+                        </a>
+                    </div>
+                </div>
+            </div> } @else {
+            <div class="alert alert-danger">
+                {{ errorMessage || 'Could not load recipe data.' }}
+            </div>
+            <div class="text-center mt-3">
+                <a routerLink="/recipes" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back to Recipes</a>
+            </div>
+            }
+            }
+        </div>
+    </div>
+</div>

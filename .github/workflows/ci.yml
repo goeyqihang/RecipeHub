@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    # The backend integration tests need a MongoDB server
+    services:
+      mongodb:
+        image: mongo:8
+        ports:
+          - 27017:27017
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build the Angular app
+        run: npm run build
+
+      - name: Backend tests (Jest + Supertest)
+        run: npm run test:backend
+        env:
+          MONGO_TEST_URI: mongodb://127.0.0.1:27017
+
+      - name: Frontend tests (Karma + headless Chrome)
+        run: npm run test:frontend

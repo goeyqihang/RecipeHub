@@ -1,0 +1,75 @@
+/*
+  Custom styling for the registration page,
+  overriding some default Bootstrap styles to create a more modern look.
+*/
+
+/* Apply gradient background to the entire container */
+.register-container {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  /* Add padding for smaller screens */
+  padding: 2rem 0;
+}
+
+/* Style the main form card */
+.card {
+  /* Increase border radius for a softer, more modern look */
+  border-radius: 1rem !important;
+}
+
+/* Style the form controls (inputs, selects) */
+.form-control-lg, .form-select-lg {
+  padding: 0.9rem 1rem;
+  font-size: 1rem;
+  /* A slightly softer border color than default */
+  border-color: #dee2e6;
+}
+
+/* Style for when an input is focused */
+.form-control-lg:focus, .form-select-lg:focus {
+  /* Match the gradient color on focus for a cohesive theme */
+  border-color: #764ba2;
+  box-shadow: 0 0 0 0.25rem rgba(118, 75, 162, 0.25);
+}
+
+/* Style for the helper text below the password field */
+.form-text {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+/* Style the primary button */
+.btn-primary {
+  background-color: #6a62d5;
+  border-color: #6a62d5;
+  padding: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Hover state for the button */
+.btn-primary:hover {
+  background-color: #5a52c4;
+  border-color: #5a52c4;
+}
+
+/* Disabled state for the button */
+.btn-primary:disabled {
+    background-color: #a5a0e5;
+    border-color: #a5a0e5;
+}
+
+/* Style the "Login here" link at the bottom */
+.card a {
+  color: #6a62d5;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease-in-out;
+}
+
+.card a:hover {
+  color: #5a52c4;
+  text-decoration: underline;
+}
+

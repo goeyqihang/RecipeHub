@@ -1,0 +1,134 @@
+<div class="container my-4">
+    <div class="text-center py-4">
+        <h1><i class="bi bi-journal-bookmark-fill"></i> {{ pageTitle$ | async }}</h1>
+        <p class="text-muted">Discover and manage your culinary collection</p>
+    </div>
+
+    <div class="d-flex justify-content-center mb-4">
+        <div class="btn-group">
+            <button class="btn" [ngClass]="(currentFilter$ | async) === 'all' ? 'btn-primary' : 'btn-outline-primary'"
+                (click)="switchFilter('all')">
+                All Recipes
+            </button>
+            <button class="btn" [ngClass]="(currentFilter$ | async) === 'mine' ? 'btn-primary' : 'btn-outline-primary'"
+                (click)="switchFilter('mine')">
+                My Recipes
+            </button>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <a routerLink="/recipes/add" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Add New Recipe
+            </a>
+        </div>
+        @if (recipes$ | async; as recipes) {
+        <span class="badge bg-light text-dark fs-6 rounded-pill">
+            {{ recipes.length }} recipes found
+        </span> }
+    </div>
+
+    @if (recipes$ | async; as recipes) {
+    @if (recipes.length > 0) {
+    @for (recipe of recipes; track recipe.recipeId) {
+    <div class="card shadow-sm mb-4">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <h3 class="card-title mb-1">{{ recipe.title }}</h3>
+                    <p class="card-subtitle text-muted small">By: {{ recipe.chef }}</p>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-info-subtle border border-info-subtle text-info-emphasis rounded-pill me-1">
+                        {{ recipe.cuisineType }}
+                    </span>
+                    <span class="badge rounded-pill" [ngClass]="{
+                                  'bg-success-subtle border border-success-subtle text-success-emphasis': recipe.difficulty === 'Easy',
+                                  'bg-warning-subtle border border-warning-subtle text-warning-emphasis': recipe.difficulty === 'Medium',
+                                  'bg-danger-subtle border border-danger-subtle text-danger-emphasis': recipe.difficulty === 'Hard'
+                                }">
+                        {{ recipe.difficulty }}
+                    </span>
+                </div>
+            </div>
+            <hr>
+            <div class="row gy-4">
+                <div class="col-lg-5">
+                    <h5 class="text-muted"><i class="bi bi-egg-fried"></i> Ingredients</h5>
+                    <hr class="mt-2 mb-3">
+                    <ul class="list-unstyled small ps-2">
+                        @for (ing of recipe.ingredients; track $index) {
+                        <li><i class="bi bi-dot"></i> {{ ing }}</li>
+                        } @empty {
+                        <li>No ingredients listed.</li>
+                        }
+                    </ul>
+                </div>
+                <div class="col-lg-7">
+                    <h5 class="text-muted"><i class="bi bi-card-checklist"></i> Instructions</h5>
+                    <hr class="mt-2 mb-3">
+                    <ol class="small ps-4">
+                        @for (inst of recipe.instructions; track $index) {
+                        <li>{{ inst }}</li>
+                        } @empty {
+                        <li>No instructions provided.</li>
+                        }
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+                <i class="bi bi-card-text"></i> ID: {{ recipe.recipeId }}
+            </small>
+            <div>
+                <a [routerLink]="['/recipes/analysis', recipe.recipeId]" class="btn btn-outline-primary btn-sm me-1">
+                    <i class="bi bi-heart-pulse"></i> Analyze Health
+                </a>
+                <a [routerLink]="['/recipes/view', recipe.recipeId]" class="btn btn-outline-secondary btn-sm me-1">
+                    <i class="bi bi-eye"></i> View
+                </a>
+                @if (isOwner(recipe.userId)) { <a [routerLink]="['/recipes/edit', recipe.recipeId]"
+                    class="btn btn-outline-primary btn-sm me-1">
+                    <i class="bi bi-pencil-square"></i> Edit
+                </a>
+                <button (click)="openDeleteConfirmation(deleteConfirmModal, recipe)"
+                    class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
+                }
+            </div>
+        </div>
+    </div>
+    }
+    } @else {
+    <div class="card text-center py-5">
+        <div class="card-body">
+            <p class="text-muted fs-5">No recipes found. Why not add one?</p>
+            <a routerLink="/recipes/add" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Add New Recipe
+            </a>
+        </div>
+    </div>
+    }
+    } @else {
+    <p>Loading recipes...</p>
+    }
+
+</div>
+
+<ng-template #deleteConfirmModal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-confirm-title">Confirm Deletion</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <p>Are you sure you want to delete the recipe "<strong>{{ recipeTitleToDelete }}</strong>"?</p>
+        <p><small class="text-muted">This action cannot be undone.</small></p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.dismiss('cancel click')">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="modal.close('delete')">Delete</button>
+    </div>
+</ng-template>

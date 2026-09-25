@@ -1,0 +1,28 @@
+.card-title {
+  margin-bottom: 0.5rem !important;
+}
+
+.card-subtitle {
+    margin-bottom: 1rem !important;
+}
+
+.text-danger {
+    color: var(--bs-danger) !important;
+}
+.fw-bold {
+    font-weight: 700 !important;
+}
+
+.btn .badge {
+    position: relative;
+    top: -1px;
+}
+
+.row.text-center .card {
+    height: 100%;
+}
+.row.text-center .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}

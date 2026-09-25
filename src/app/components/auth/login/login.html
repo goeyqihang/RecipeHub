@@ -1,0 +1,76 @@
+<div class="login-container">
+  <div class="container">
+    <div class="row justify-content-center align-items-center min-vh-100">
+      <div class="col-md-8 col-lg-6 col-xl-5">
+
+        <div class="card shadow-lg border-0">
+          <div class="card-body p-4 p-md-5">
+
+            <div class="text-center mb-4">
+              <h2 class="fw-bolder">Login</h2>
+              <p class="text-muted">Welcome back! Please sign in to your account.</p>
+            </div>
+
+            <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm)" novalidate>
+
+              <!-- Email Input -->
+              <div class="mb-3">
+                <label for="email" class="form-label fw-bold">Email Address:</label>
+                <input type="email" id="email" name="email" class="form-control form-control-lg"
+                       [(ngModel)]="model.email" #email="ngModel"
+                       required email
+                       [ngClass]="{ 'is-invalid': email.invalid && email.touched }">
+
+                @if (email.invalid && email.touched) {
+                  <div class="invalid-feedback">
+                    @if (email.errors?.['required']) {
+                      <div>Email is required.</div>
+                    }
+                    @if (email.errors?.['email']) {
+                      <div>Please enter a valid email address.</div>
+                    }
+                  </div>
+                }
+              </div>
+
+              <!-- Password Input -->
+              <div class="mb-4">
+                <label for="password" class="form-label fw-bold">Password:</label>
+                <input type="password" id="password" name="password" class="form-control form-control-lg"
+                       [(ngModel)]="model.password" #password="ngModel"
+                       required
+                       [ngClass]="{ 'is-invalid': password.invalid && password.touched }">
+
+                @if (password.invalid && password.touched) {
+                  <div class="invalid-feedback">
+                    @if (password.errors?.['required']) {
+                      <div>Password is required.</div>
+                    }
+                  </div>
+                }
+              </div>
+
+              <!-- API Error Message Display -->
+              @if (errorMessage) {
+                <div class="alert alert-danger mt-3">
+                  {{ errorMessage }}
+                </div>
+              }
+
+              <!-- Submit Button -->
+              <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-primary btn-lg" [disabled]="!loginForm.valid">Login</button>
+              </div>
+            </form>
+
+            <!-- Link to Register Page -->
+            <div class="text-center mt-4">
+              <p class="text-muted">Don't have an account? <a routerLink="/register">Register here</a></p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

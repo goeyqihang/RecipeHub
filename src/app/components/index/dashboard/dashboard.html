@@ -1,0 +1,22 @@
+<div class="container my-5">
+  @if (currentUser$ | async; as user) {
+    @switch (user.role) {
+      @case ('chef') {
+        <app-chef-dashboard></app-chef-dashboard>
+      }
+      @case ('manager') {
+        <app-manager-dashboard></app-manager-dashboard>
+      }
+      @case ('admin') {
+        <app-admin-dashboard></app-admin-dashboard>
+      }
+      @default {
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 50vh;">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      }
+    }
+  }
+</div>

@@ -1,0 +1,28 @@
+.card-header h2 {
+    color: #333;
+}
+
+
+dl.row dt {
+    font-weight: 600;
+    color: #555;
+    padding-right: 0;
+    text-align: right;
+}
+
+dl.row dd {
+    margin-bottom: 0.5rem;
+}
+
+
+.card-footer > div {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.text-danger {
+    color: var(--bs-danger) !important;
+}
+.fw-bold {
+    font-weight: 700 !important;
+}

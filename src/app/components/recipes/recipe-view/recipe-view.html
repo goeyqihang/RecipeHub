@@ -1,0 +1,136 @@
+<div class="container my-5">
+    @if (isLoading) {
+    <div class="text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Loading recipe...</p>
+    </div>
+    } @else if (errorMessage) {
+    <div class="alert alert-danger">{{ errorMessage }}</div>
+    <div class="text-center mt-3">
+        <a routerLink="/recipes" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back to Recipes</a>
+    </div>
+    } @else if (recipe$ | async; as recipe) {
+    @if (recipe) {
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-5 mb-0">{{ recipe.title }}</h1>
+        <div>
+            @if (isOwner(recipe.userId)) {
+            <a [routerLink]="['/recipes/edit', recipe.recipeId]" class="btn btn-warning me-2">
+                <i class="bi bi-pencil-square"></i> Edit
+            </a>
+            <button (click)="openDeleteConfirmation(deleteConfirmModalView)" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Delete
+            </button>
+            }
+            <a routerLink="/recipes" class="btn btn-outline-secondary ms-2">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Recipe Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="recipe-info-grid">
+                        <div><strong>Chef:</strong> {{ recipe.chef }}</div>
+                        <div><strong>Difficulty:</strong> {{ recipe.difficulty }}</div>
+                        <div><strong>Cuisine:</strong> {{ recipe.cuisineType }}</div>
+                        <div><strong>Prep Time:</strong> {{ recipe.prepTime }} mins</div>
+                        <div><strong>Meal Type:</strong> {{ recipe.mealType }}</div>
+                        <div><strong>Servings:</strong> {{ recipe.servings }}</div>
+                        <div class="grid-span-2"><strong>Created:</strong> {{ recipe.createdDate | date:'longDate' }}
+                        </div>
+                        <div class="grid-span-2"><strong>Views:</strong> {{ recipe.views }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-egg-fried"></i> Ingredients (Original)</h5>
+                        </div>
+                        <div class="card-body">
+                            @if (recipe.ingredients && recipe.ingredients.length > 0) {
+                            <ul class="list-unstyled">
+                                @for (ing of recipe.ingredients; track $index) {
+                                <li>{{ ing }}</li>
+                                }
+                            </ul>
+                            } @else {
+                            <p class="text-muted">No ingredients listed.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-card-checklist"></i> Instructions (Original)</h5>
+                        </div>
+                        <div class="card-body">
+                            @if (recipe.instructions && recipe.instructions.length > 0) {
+                            <ol class="ps-3">
+                                @for (inst of recipe.instructions; track $index) {
+                                <li>{{ inst }}</li>
+                                }
+                            </ol>
+                            } @else {
+                            <p class="text-muted">No instructions provided.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Smart Tools</h5>
+                </div>
+                <div class="card-body">
+                    <a [routerLink]="['/recipes/analysis', recipe.recipeId]" class="btn btn-primary d-block mb-2">
+                        <i class="bi bi-heart-pulse"></i> AI Health Analysis
+                    </a>
+
+                    <div class="border-top pt-3 mt-3">
+                        <app-recipe-translator [recipeId]="recipe.recipeId"></app-recipe-translator>
+                    </div>
+                    <div class="border-top pt-3 mt-3">
+                        <app-recipe-audio-player [recipeId]="recipe.recipeId" [instructions]="recipe.instructions">
+                        </app-recipe-audio-player>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> } @else if (!isLoading) {
+    <div class="alert alert-warning">Recipe not found or could not be loaded.</div>
+    <div class="text-center mt-3">
+        <a routerLink="/recipes" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back to Recipes</a>
+    </div>
+    }
+    }
+</div>
+
+<ng-template #deleteConfirmModalView let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-confirm-title-view">Confirm Deletion</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <p>Are you sure you want to delete the recipe "<strong>{{ recipeTitleToDelete }}</strong>"?</p>
+        <p><small class="text-muted">This action cannot be undone.</small></p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.dismiss('cancel click')">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="modal.close('delete')">Delete</button>
+    </div>
+</ng-template>

@@ -1,0 +1,123 @@
+@if (dashboardData$ | async; as data) {
+<div class="p-5 mb-5 bg-light rounded-3 shadow-sm border">
+    @if (currentUser$ | async; as user) {
+    <h4>Welcome back, <strong>{{ user.fullname }}!</strong> ({{ user.role }})</h4>
+    <p class="text-muted mb-0">
+        <i class="bi bi-person-circle"></i> User ID: <strong>{{ user.userId }}</strong> |
+        <i class="bi bi-envelope-fill"></i> Email: <strong>{{ user.email }}</strong>
+    </p>
+    }
+</div>
+
+<div class="row text-center g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h1 class="display-4 text-primary"><i class="bi bi-people-fill"></i></h1>
+                <h2 class="card-title fw-bold">{{ data.stats.users }}</h2>
+                <p class="card-text text-muted">Registered Users</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h1 class="display-4 text-success"><i class="bi bi-journal-bookmark-fill"></i></h1>
+                <h2 class="card-title fw-bold">{{ data.stats.recipes }}</h2>
+                <p class="card-text text-muted">Total Recipes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h1 class="display-4 text-info"><i class="bi bi-box-seam"></i></h1>
+                <h2 class="card-title fw-bold">{{ data.stats.inventory }}</h2>
+                <p class="card-text text-muted">Inventory Items</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2 class="pb-2 border-bottom">Admin Dashboard</h2>
+
+<div class="row g-4 py-5">
+    <div class="col-lg-6">
+        <h4><i class="bi bi-people-fill text-primary"></i> User Overview</h4>
+        <div class="card">
+            <div class="card-header">
+                <strong>User Role Distribution</strong>
+            </div>
+            <div class="card-body">
+                @if (data.userRoleDistribution && data.userRoleDistribution.length > 0) {
+                <ul class="list-group list-group-flush">
+                    @for (role of data.userRoleDistribution; track role._id) {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-capitalize">{{ role._id }}s</span>
+                        <span class="badge bg-primary rounded-pill">{{ role.count }}</span>
+                    </li>
+                    }
+                </ul>
+                } @else {
+                <p class="text-muted">No user data to display.</p>
+                }
+            </div>
+            <div class="card-header border-top">
+                <strong>Recently Registered Users</strong>
+            </div>
+            <ul class="list-group list-group-flush">
+                @if (data.recentUsers && data.recentUsers.length > 0) {
+                @for (user of data.recentUsers; track user._id) {
+                <li class="list-group-item">
+                    {{ user.fullname }} ({{ user.email }})
+                    <br>
+                    <small class="text-muted">Registered on {{ user.createdAt | date: 'shortDate' }}</small>
+                </li>
+                }
+                } @else {
+                <li class="list-group-item text-muted">No new users.</li>
+                }
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <h4><i class="bi bi-activity text-success"></i> System Activity</h4>
+        <div class="card">
+            <div class="card-header">
+                <strong>Recent Activity</strong>
+            </div>
+            <div class="card-body">
+                <h6 class="card-title">Recent Recipe Additions</h6>
+                @if (data.recentRecipes && data.recentRecipes.length > 0) {
+                <ul class="list-group list-group-flush mb-3">
+                    @for (recipe of data.recentRecipes; track recipe._id) {
+                    <li class="list-group-item">
+                        {{ recipe.title }} <small class="text-muted">- by {{ recipe.chef }}</small>
+                    </li>
+                    }
+                </ul>
+                } @else {
+                <p class="text-muted small">No new recipes.</p>
+                }
+
+                <h6 class="card-title mt-3">Recent Inventory Additions</h6>
+                @if (data.recentInventory && data.recentInventory.length > 0) {
+                <ul class="list-group list-group-flush">
+                    @for (item of data.recentInventory; track item._id) {
+                    <li class="list-group-item">
+                        {{ item.ingredientName }} <small class="text-muted">({{ item.quantity }} {{ item.unit
+                            }})</small>
+                    </li>
+                    }
+                </ul>
+                } @else {
+                <p class="text-muted small">No new inventory items.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+} @else {
+<p>Loading admin dashboard...</p>
+}

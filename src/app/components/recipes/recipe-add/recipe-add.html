@@ -1,0 +1,24 @@
+<div class="container mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-md-9">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white py-3">
+          <h2 class="mb-0 text-center">
+            <i class="bi bi-journal-plus"></i> Add a New Recipe
+          </h2>
+        </div>
+        <div class="card-body p-4 p-md-5">
+          @if (errorMessage) {
+          <div class="alert alert-danger">{{ errorMessage }}</div>
+          }
+          @if (successMessage) {
+          <div class="alert alert-success">{{ successMessage }}</div>
+          }
+
+          <app-recipe-form [chefName]="chefName" [saving]="isSaving" submitLabel="Submit Recipe"
+            (save)="onSave($event)"></app-recipe-form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,91 @@
+@if (dashboardData$ | async; as data) {
+<div class="p-5 mb-5 bg-light rounded-3 shadow-sm border">
+    @if (currentUser$ | async; as user) {
+    <h4>Welcome back, <strong>{{ user.fullname }}!</strong> ({{ user.role }})</h4>
+    <p class="text-muted mb-0">
+        <i class="bi bi-person-circle"></i> User ID: <strong>{{ user.userId }}</strong> |
+        <i class="bi bi-envelope-fill"></i> Email: <strong>{{ user.email }}</strong>
+    </p>
+    }
+</div>
+
+<div class="row text-center g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h1 class="display-4 text-primary"><i class="bi bi-people-fill"></i></h1>
+                <h2 class="card-title fw-bold">{{ data.stats.users }}</h2>
+                <p class="card-text text-muted">Registered Users</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h1 class="display-4 text-success"><i class="bi bi-journal-bookmark-fill"></i></h1>
+                <h2 class="card-title fw-bold">{{ data.stats.recipes }}</h2>
+                <p class="card-text text-muted">Total Recipes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h1 class="display-4 text-info"><i class="bi bi-box-seam"></i></h1>
+                <h2 class="card-title fw-bold">{{ data.stats.inventory }}</h2>
+                <p class="card-text text-muted">Inventory Items</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2 class="pb-2 border-bottom">Manager Dashboard</h2>
+<div class="row g-4 py-5">
+    <div class="col-lg-12">
+        <h4><i class="bi bi-clipboard-data-fill text-info"></i> Inventory Overview</h4>
+        <div class="card">
+            <div class="card-header">
+                <strong>Total Stock Value: <span class="text-success">{{ data.totalValue | currency:'$'
+                        }}</span></strong>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-danger">Expiring Soon (Next 7 Days)</h6>
+                        @if (data.expiringItems && data.expiringItems.length > 0) {
+                        <ul class="list-group list-group-flush">
+                            @for (item of data.expiringItems; track $index) {
+                            <li class="list-group-item">
+                                {{ item.name }} - <small>{{ item.expirationDate | date: 'shortDate' }}</small>
+                            </li>
+                            }
+                        </ul>
+                        } @else {
+                        <p class="text-muted small">No items expiring soon.</p>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-warning">Low Stock Items</h6>
+                        @if (data.lowStockItems && data.lowStockItems.length > 0) {
+                        <ul class="list-group list-group-flush">
+                            @for (item of data.lowStockItems; track item._id) {
+                            <li class="list-group-item">
+                                {{ item.ingredientName }} ({{ item.quantity }} {{ item.unit }} left)
+                            </li>
+                            }
+                        </ul>
+                        } @else {
+                        <p class="text-muted small">No items are low in stock.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-center">
+                <a routerLink="/inventory" class="btn btn-outline-info btn-sm">View Full Inventory</a>
+            </div>
+        </div>
+    </div>
+</div>
+} @else {
+<p>Loading manager dashboard...</p>
+}

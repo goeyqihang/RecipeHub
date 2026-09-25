@@ -1,0 +1,22 @@
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #6c757d;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.navbar-brand strong {
+    font-size: 1.25rem;
+}
+
+.navbar-logo {
+  height: 30px;
+  width: auto;
+  margin-right: 8px;
+  vertical-align: middle;
+}

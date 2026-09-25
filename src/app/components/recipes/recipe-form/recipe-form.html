@@ -1,0 +1,151 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+  <div class="mb-3">
+    <label for="title" class="form-label">Title</label>
+    <input type="text" id="title" class="form-control" formControlName="title"
+      placeholder="e.g., Classic Spaghetti Carbonara" [class.is-invalid]="showErrors(form.controls.title)">
+    @if (showErrors(form.controls.title)) {
+    <div class="invalid-feedback">
+      @if (form.controls.title.hasError('required')) { <div>Title is required.</div> }
+      @else if (form.controls.title.hasError('minlength')) { <div>Title must be at least {{ rules.title.min }} characters long.</div> }
+      @if (form.controls.title.hasError('maxlength')) { <div>Title cannot exceed {{ rules.title.max }} characters.</div> }
+    </div>
+    }
+  </div>
+
+  <div class="mb-4">
+    <label for="chef" class="form-label">Chef</label>
+    <input type="text" id="chef" class="form-control bg-light" [value]="chefName" readonly>
+  </div>
+
+  <!-- Ingredients: one input per ingredient -->
+  <fieldset class="mb-4" formArrayName="ingredients">
+    <legend class="form-label fs-6 mb-2">
+      Ingredients <span class="text-muted small">({{ ingredients.length }} of max {{ rules.ingredients.maxItems }})</span>
+    </legend>
+    @for (control of ingredients.controls; track control; let i = $index) {
+    <div class="input-group has-validation mb-2">
+      <span class="input-group-text list-number">{{ i + 1 }}</span>
+      <input type="text" class="form-control" [formControlName]="i" [attr.aria-label]="'Ingredient ' + (i + 1)"
+        placeholder="e.g., 200 g spaghetti" [class.is-invalid]="showErrors(control)">
+      <button type="button" class="btn btn-outline-secondary" (click)="removeIngredient(i)"
+        [disabled]="ingredients.length <= rules.ingredients.minItems" [attr.aria-label]="'Remove ingredient ' + (i + 1)">
+        <i class="bi bi-x-lg"></i>
+      </button>
+      @if (showErrors(control)) {
+      <div class="invalid-feedback">Each ingredient needs at least {{ rules.ingredients.minCharPerItem }} characters.</div>
+      }
+    </div>
+    }
+    @if (ingredients.hasError('itemCount')) {
+    <div class="text-danger small mb-2">
+      A recipe needs {{ rules.ingredients.minItems }} to {{ rules.ingredients.maxItems }} ingredients.
+    </div>
+    }
+    <button type="button" class="btn btn-outline-primary btn-sm" (click)="addIngredient()"
+      [disabled]="ingredients.length >= rules.ingredients.maxItems">
+      <i class="bi bi-plus-lg"></i> Add ingredient
+    </button>
+  </fieldset>
+
+  <!-- Instructions: one textarea per step -->
+  <fieldset class="mb-4" formArrayName="instructions">
+    <legend class="form-label fs-6 mb-2">
+      Instructions <span class="text-muted small">({{ instructions.length }} of max {{ rules.instructions.maxItems }})</span>
+    </legend>
+    @for (control of instructions.controls; track control; let i = $index) {
+    <div class="input-group has-validation mb-2">
+      <span class="input-group-text list-number">{{ i + 1 }}</span>
+      <textarea class="form-control" rows="2" [formControlName]="i" [attr.aria-label]="'Step ' + (i + 1)"
+        placeholder="e.g., Boil the pasta in salted water until al dente." [class.is-invalid]="showErrors(control)"></textarea>
+      <button type="button" class="btn btn-outline-secondary" (click)="removeInstruction(i)"
+        [disabled]="instructions.length <= rules.instructions.minItems" [attr.aria-label]="'Remove step ' + (i + 1)">
+        <i class="bi bi-x-lg"></i>
+      </button>
+      @if (showErrors(control)) {
+      <div class="invalid-feedback">Each step needs at least {{ rules.instructions.minCharPerItem }} characters.</div>
+      }
+    </div>
+    }
+    @if (instructions.hasError('itemCount')) {
+    <div class="text-danger small mb-2">
+      A recipe needs {{ rules.instructions.minItems }} to {{ rules.instructions.maxItems }} steps.
+    </div>
+    }
+    <button type="button" class="btn btn-outline-primary btn-sm" (click)="addInstruction()"
+      [disabled]="instructions.length >= rules.instructions.maxItems">
+      <i class="bi bi-plus-lg"></i> Add step
+    </button>
+  </fieldset>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label for="mealType" class="form-label">Meal Type</label>
+      <select class="form-select" id="mealType" formControlName="mealType" [class.is-invalid]="showErrors(form.controls.mealType)">
+        <option value="" disabled>Choose...</option>
+        @for (type of mealTypes; track type) {
+        <option [value]="type">{{ type }}</option>
+        }
+      </select>
+      <div class="invalid-feedback">Meal type is required.</div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <label for="cuisineType" class="form-label">Cuisine Type</label>
+      <select class="form-select" id="cuisineType" formControlName="cuisineType" [class.is-invalid]="showErrors(form.controls.cuisineType)">
+        <option value="" disabled>Choose...</option>
+        @for (type of cuisineTypes; track type) {
+        <option [value]="type">{{ type }}</option>
+        }
+      </select>
+      <div class="invalid-feedback">Cuisine type is required.</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4 mb-3">
+      <label for="prepTime" class="form-label">Prep Time ({{ rules.prepTime.min }}-{{ rules.prepTime.max }} min)</label>
+      <input type="number" id="prepTime" class="form-control" formControlName="prepTime"
+        [min]="rules.prepTime.min" [max]="rules.prepTime.max" [class.is-invalid]="showErrors(form.controls.prepTime)">
+      <div class="invalid-feedback">
+        Prep time must be between {{ rules.prepTime.min }} and {{ rules.prepTime.max }} minutes.
+      </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+      <label for="difficulty" class="form-label">Difficulty</label>
+      <select class="form-select" id="difficulty" formControlName="difficulty" [class.is-invalid]="showErrors(form.controls.difficulty)">
+        <option value="" disabled>Choose...</option>
+        @for (level of difficultyLevels; track level) {
+        <option [value]="level">{{ level }}</option>
+        }
+      </select>
+      <div class="invalid-feedback">Difficulty is required.</div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+      <label for="servings" class="form-label">Servings ({{ rules.servings.min }}-{{ rules.servings.max }})</label>
+      <input type="number" id="servings" class="form-control" formControlName="servings"
+        [min]="rules.servings.min" [max]="rules.servings.max" [class.is-invalid]="showErrors(form.controls.servings)">
+      <div class="invalid-feedback">
+        Servings must be between {{ rules.servings.min }} and {{ rules.servings.max }}.
+      </div>
+    </div>
+  </div>
+
+  @if (submitted && form.invalid) {
+  <div class="alert alert-danger mt-3">Please correct the errors highlighted in the form.</div>
+  }
+
+  <div class="d-flex justify-content-end align-items-center mt-4">
+    <a [routerLink]="cancelLink" class="btn btn-secondary btn-lg me-2">Cancel</a>
+    <button type="submit" class="btn btn-primary btn-lg d-inline-flex align-items-center" [disabled]="saving">
+      @if (saving) {
+      <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+      <span role="status">Saving...</span>
+      } @else {
+      <i class="bi bi-check-lg me-1"></i> {{ submitLabel }}
+      }
+    </button>
+  </div>
+</form>

@@ -1,0 +1,116 @@
+@if (dashboardData$ | async; as data) {
+  <div class="p-5 mb-5 bg-light rounded-3 shadow-sm border">
+    @if (currentUser$ | async; as user) {
+      <h4 class="fw-bold">Welcome back, {{ user.fullname }}! ({{user.role}})</h4>
+      <p class="text-muted mb-0">
+        <i class="bi bi-person-circle"></i> User ID: <strong>{{ user.userId }}</strong> |
+        <i class="bi bi-envelope-fill"></i> Email: <strong>{{ user.email }}</strong>
+      </p>
+    }
+  </div>
+
+  <div class="row text-center g-4 mb-5">
+      <div class="col-md-4">
+          <div class="card shadow-sm">
+              <div class="card-body">
+                  <h1 class="display-4 text-primary"><i class="bi bi-people-fill"></i></h1>
+                  <h2 class="card-title fw-bold">{{ data.stats.users }}</h2>
+                  <p class="card-text text-muted">Registered Users</p>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-4">
+          <div class="card shadow-sm">
+              <div class="card-body">
+                  <h1 class="display-4 text-success"><i class="bi bi-journal-bookmark-fill"></i></h1>
+                  <h2 class="card-title fw-bold">{{ data.stats.recipes }}</h2>
+                  <p class="card-text text-muted">Total Recipes</p>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-4">
+          <div class="card shadow-sm">
+              <div class="card-body">
+                  <h1 class="display-4 text-info"><i class="bi bi-box-seam"></i></h1>
+                  <h2 class="card-title fw-bold">{{ data.stats.inventory }}</h2>
+                  <p class="card-text text-muted">Inventory Items</p>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <h2 class="pb-2 border-bottom">Chef Dashboard</h2>
+  <div class="row g-4 py-5">
+    <div class="col-lg-6">
+        <h4><i class="bi bi-journal-richtext text-primary"></i> My Recent Recipes</h4>
+        <p>Here are your 5 most recently added recipes. <a routerLink="/recipes" [queryParams]="{filter: 'mine'}">View all</a></p>
+        @if (data.chefRecipes && data.chefRecipes.length > 0) {
+            <div class="list-group">
+                @for (recipe of data.chefRecipes; track recipe.recipeId) {
+                    <a [routerLink]="['/recipes/view', recipe.recipeId]" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong class="mb-1">{{ recipe.title }}</strong><br>
+                            <small class="text-muted">Cuisine: {{ recipe.cuisineType }} | Difficulty: {{ recipe.difficulty }}</small>
+                        </div>
+                        <span class="badge bg-primary rounded-pill"><i class="bi bi-arrow-right"></i></span>
+                    </a>
+                }
+            </div>
+        } @else {
+            <div class="alert alert-secondary">You haven't added any recipes yet. <a routerLink="/recipes/add">Add your first recipe!</a></div>
+        }
+    </div>
+
+    <div class="col-lg-6">
+        <h4><i class="bi bi-box-seam text-success"></i> Shared Inventory</h4>
+        <p>The inventory is shared across all users. You can view, add, or manage items here.</p>
+        <div class="list-group">
+            <a routerLink="/inventory" class="list-group-item list-group-item-action"><i class="bi bi-card-list me-2"></i>View Full Inventory</a>
+            <a routerLink="/inventory/add" class="list-group-item list-group-item-action"><i class="bi bi-plus-circle me-2"></i>Add New Item</a>
+        </div>
+    </div>
+  </div>
+
+  <div class="row g-4 py-3">
+    <div class="col-lg-6">
+        <h4><i class="bi bi-lightbulb-fill text-info"></i> What to Cook Next?</h4>
+        <p>Based on your current inventory, you could make:</p>
+        @if (data.recipeSuggestions && data.recipeSuggestions.length > 0) {
+            <div class="list-group">
+                @for (recipe of data.recipeSuggestions; track recipe.recipeId) {
+                    <a [routerLink]="['/recipes/view', recipe.recipeId]" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ recipe.title }}</h5>
+                            <small class="text-muted">{{ recipe.cookabilityScore.toFixed(0) }}% match</small>
+                        </div>
+                        <p class="mb-1">{{ recipe.cuisineType }} · {{ recipe.difficulty }} · by {{ recipe.chef }}</p>
+                    </a>
+                }
+            </div>
+        } @else {
+            <div class="alert alert-light">Not enough inventory data to make suggestions.</div>
+        }
+    </div>
+
+    <div class="col-lg-6">
+        <h4><i class="bi bi-alarm-fill text-danger"></i> Expiring Soon!</h4>
+        <p>Use these ingredients before they go bad:</p>
+        @if (data.expiringItems && data.expiringItems.length > 0) {
+            <ul class="list-group">
+                @for (item of data.expiringItems; track item._id) {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ item.ingredientName }}
+                        <span class="badge bg-danger rounded-pill">
+                            Expires on {{ item.expirationDate | date: 'shortDate' }}
+                        </span>
+                    </li>
+                }
+            </ul>
+        } @else {
+            <div class="alert alert-success">Great! Nothing is expiring in the next 3 days.</div>
+        }
+    </div>
+  </div>
+} @else {
+  <p>Loading chef dashboard...</p>
+}

@@ -1,0 +1,7 @@
+.card {
+  border-radius: 0.5rem;
+}
+
+.form-label.fw-bold {
+    font-weight: 600 !important;
+}

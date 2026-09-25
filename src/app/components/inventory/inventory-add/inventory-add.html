@@ -1,0 +1,187 @@
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-9">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h2 class="mb-0 text-center">
+                        <i class="bi bi-box-arrow-in-down"></i> Add New Inventory Item
+                    </h2>
+                </div>
+                <div class="card-body p-4 p-md-5">
+
+                    @if (errorMessage) {
+                    <div class="alert alert-danger" role="alert">
+                        <h5 class="alert-heading">Error!</h5>
+                        <p>{{ errorMessage }}</p>
+                        <hr>
+                        <p class="mb-0">Please correct the fields below and try again.</p>
+                    </div>
+                    }
+                    @if (successMessage) {
+                    <div class="alert alert-success">{{ successMessage }}</div>
+                    }
+
+                    <form #inventoryForm="ngForm" (ngSubmit)="onSubmit(inventoryForm)" novalidate>
+
+                        <div class="mb-3">
+                            <label for="ingredientName" class="form-label fw-bold">Ingredient Name</label> <input
+                                type="text" class="form-control" id="ingredientName" name="ingredientName"
+                                placeholder="e.g., Fresh Tomatoes" [(ngModel)]="inventoryInput.ingredientName"
+                                #ingredientName="ngModel" required
+                                [minlength]="validationRules.ingredientName.minlength"
+                                [maxlength]="validationRules.ingredientName.maxlength"
+                                [pattern]="validationRules.ingredientName.pattern"
+                                [title]="validationRules.ingredientName.title"
+                                [ngClass]="{ 'is-invalid': ingredientName.invalid && (ingredientName.touched || submitted) }">
+                            @if (ingredientName.invalid && (ingredientName.touched || submitted)) {
+                            <div class="invalid-feedback">
+                                @if (ingredientName.errors?.['required']) { <div>Ingredient name is required.</div> }
+                                @if (ingredientName.errors?.['minlength']) { <div>Must be at least {{
+                                    validationRules.ingredientName.minlength }} characters.</div> }
+                                @if (ingredientName.errors?.['maxlength']) { <div>Cannot exceed {{
+                                    validationRules.ingredientName.maxlength }} characters.</div> }
+                                @if (ingredientName.errors?.['pattern']) { <div>{{ validationRules.ingredientName.title
+                                    }}</div> }
+                            </div>
+                            }
+                        </div>
+
+                        @if (currentUserFullname && currentUserId) { <div class="mb-3">
+                            <label for="addedBy" class="form-label fw-bold">Added By</label> <input type="text"
+                                class="form-control bg-light" id="addedBy" name="addedBy"
+                                [value]="currentUserFullname + ' (' + currentUserId + ')'" readonly>
+                            <div class="form-text">This is automatically set and cannot be changed.</div>
+                        </div>
+                        }
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3"> <label for="quantity"
+                                    class="form-label fw-bold">Quantity</label> <input type="number"
+                                    class="form-control" id="quantity" name="quantity"
+                                    [(ngModel)]="inventoryInput.quantity" #quantity="ngModel" required
+                                    [min]="validationRules.quantity.min" [max]="validationRules.quantity.max"
+                                    [step]="validationRules.quantity.step" placeholder="e.g., 2.5"
+                                    [ngClass]="{ 'is-invalid': quantity.invalid && (quantity.touched || submitted) }">
+                                @if (quantity.invalid && (quantity.touched || submitted)) {
+                                <div class="invalid-feedback">
+                                    @if (quantity.errors?.['required']) { <div>Quantity is required.</div> }
+                                    @if (quantity.errors?.['min']) { <div>Must be at least {{
+                                        validationRules.quantity.min }}.</div> }
+                                    @if (quantity.errors?.['max']) { <div>Cannot exceed {{ validationRules.quantity.max
+                                        }}.</div> }
+                                    @if (quantity.errors?.['number']) { <div>Please enter a valid number.</div> }
+                                </div>
+                                }
+                            </div>
+                            <div class="col-md-6 mb-3"> <label for="unit" class="form-label fw-bold">Unit</label>
+                                <select class="form-select" id="unit" name="unit" [(ngModel)]="inventoryInput.unit"
+                                    #unit="ngModel" required
+                                    [ngClass]="{ 'is-invalid': unit.invalid && (unit.touched || submitted) }">
+                                    <option value="" selected disabled>Choose...</option> @for(u of units; track u) {
+                                    <option [value]="u">{{ u }}</option> }
+                                </select> @if (unit.invalid && (unit.touched || submitted)) {
+                                <div class="invalid-feedback">
+                                    @if (unit.errors?.['required']) { <div>Unit is required.</div> }
+                                </div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3"> <label for="category"
+                                    class="form-label fw-bold">Category</label> <select class="form-select"
+                                    id="category" name="category" [(ngModel)]="inventoryInput.category"
+                                    #category="ngModel" required
+                                    [ngClass]="{ 'is-invalid': category.invalid && (category.touched || submitted) }">
+                                    <option value="" selected disabled>Choose...</option> @for(cat of categories; track
+                                    cat) { <option [value]="cat">{{ cat }}</option> }
+                                </select> @if (category.invalid && (category.touched || submitted)) {
+                                <div class="invalid-feedback">
+                                    @if (category.errors?.['required']) { <div>Category is required.</div> }
+                                </div>
+                                }
+                            </div>
+                            <div class="col-md-6 mb-3"> <label for="location" class="form-label fw-bold">Storage
+                                    Location</label> <select class="form-select" id="location" name="location"
+                                    [(ngModel)]="inventoryInput.location" #location="ngModel" required
+                                    [ngClass]="{ 'is-invalid': location.invalid && (location.touched || submitted) }">
+                                    <option value="" selected disabled>Choose...</option> @for(loc of locations; track
+                                    loc) { <option [value]="loc">{{ loc }}</option> }
+                                </select> @if (location.invalid && (location.touched || submitted)) {
+                                <div class="invalid-feedback">
+                                    @if (location.errors?.['required']) { <div>Location is required.</div> }
+                                </div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3"> <label for="purchaseDate" class="form-label fw-bold">Purchase
+                                    Date</label> <input type="date" class="form-control" id="purchaseDate"
+                                    name="purchaseDate" [(ngModel)]="inventoryInput.purchaseDate"
+                                    #purchaseDate="ngModel" required [max]="todayDateString"
+                                    [ngClass]="{ 'is-invalid': purchaseDate.invalid && (purchaseDate.touched || submitted) }">
+                                @if (purchaseDate.invalid && (purchaseDate.touched || submitted)) {
+                                <div class="invalid-feedback">
+                                    @if (purchaseDate.errors?.['required']) { <div>Purchase date is required.</div> }
+                                    @if (purchaseDate.errors?.['max']) { <div>Purchase date cannot be in the future.
+                                    </div> }
+                                </div>
+                                }
+                            </div>
+                            <div class="col-md-6 mb-3"> <label for="expirationDate"
+                                    class="form-label fw-bold">Expiration Date</label> <input type="date"
+                                    class="form-control" id="expirationDate" name="expirationDate"
+                                    [(ngModel)]="inventoryInput.expirationDate" #expirationDate="ngModel" required
+                                    [min]="inventoryInput.purchaseDate"
+                                    [ngClass]="{ 'is-invalid': (expirationDate.invalid || expirationDate.errors?.['invalidDateOrder']) && (expirationDate.touched || submitted) }">
+                                @if ((expirationDate.invalid || expirationDate.errors?.['invalidDateOrder']) &&
+                                (expirationDate.touched || submitted)) {
+                                <div class="invalid-feedback">
+                                    @if (expirationDate.errors?.['required']) { <div>Expiration date is required.</div>
+                                    }
+                                    @if (expirationDate.errors?.['min'] || expirationDate.errors?.['invalidDateOrder'])
+                                    { <div>Expiration date must be after the purchase date.</div> }
+                                </div>
+                                }
+                                <div class="form-text">Must be after purchase date.</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="cost" class="form-label fw-bold">Purchase Cost ($)</label> <input type="number"
+                                class="form-control" id="cost" name="cost" [(ngModel)]="inventoryInput.cost"
+                                #cost="ngModel" required [min]="validationRules.cost.min"
+                                [max]="validationRules.cost.max" [step]="validationRules.cost.step"
+                                placeholder="e.g., 4.50"
+                                [ngClass]="{ 'is-invalid': cost.invalid && (cost.touched || submitted) }"> @if
+                            (cost.invalid && (cost.touched || submitted)) {
+                            <div class="invalid-feedback">
+                                @if (cost.errors?.['required']) { <div>Cost is required.</div> }
+                                @if (cost.errors?.['min']) { <div>Must be at least ${{ validationRules.cost.min }}.
+                                </div> }
+                                @if (cost.errors?.['max']) { <div>Cannot exceed ${{ validationRules.cost.max }}.</div> }
+                                @if (cost.errors?.['number']) { <div>Please enter a valid cost.</div> }
+                            </div>
+                            }
+                        </div>
+
+                        <div class="d-flex justify-content-end align-items-center mt-4">
+                            <a routerLink="/inventory" class="btn btn-secondary btn-lg me-2">Cancel</a>
+                            <button type="submit"
+                                class="btn btn-primary btn-lg d-inline-flex align-items-center justify-content-center"
+                                [disabled]="!inventoryForm.valid || !isExpirationDateValid(inventoryForm) || isLoading">
+                                @if(isLoading) {
+                                <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                                <span role="status"> Saving...</span>
+                                } @else {
+                                <i class="bi bi-plus-lg me-1"></i> <span>Submit Item</span> }
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
