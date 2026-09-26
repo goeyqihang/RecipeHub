@@ -10,6 +10,7 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/goeyqihang/RecipeHub/actions/workflows/ci.yml"><img src="https://github.com/goeyqihang/RecipeHub/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://angular.dev/"><img src="https://img.shields.io/badge/Angular-20-DD0031?logo=angular&logoColor=white" alt="Angular 20"></a>
   <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-20.19%2B-339933?logo=nodedotjs&logoColor=white" alt="Node.js 20.19+"></a>
   <a href="https://expressjs.com/"><img src="https://img.shields.io/badge/Express-5-000000?logo=express&logoColor=white" alt="Express 5"></a>
